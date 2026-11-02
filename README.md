@@ -26,5 +26,16 @@ Then open http://localhost:8137.
 ## Structure
 
 - `index.html`: page shell; loads Phaser 3.80.1 from a CDN
-- `src/levels.js`: level maps and register-driven objects (`bridge`, `block`, `door`)
-- `src/game.js`: game scene, rules and rendering
+- `src/rules.js`: pure game rules, shared by the game and the solver
+- `src/levels.js`: level maps, register-driven objects (`bridge`, `block`, `door`) and par
+- `src/game.js`: Phaser scene, input and rendering
+- `tools/solve.js`: solver that checks every level is solvable and its par is right
+
+## Checking levels
+
+```bash
+node tools/solve.js      # all levels
+node tools/solve.js 7    # just level 7
+```
+
+It prints the fewest-shifts solution for each level and exits non-zero if a level is unsolvable or its `par` is wrong.

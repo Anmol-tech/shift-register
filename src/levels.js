@@ -5,11 +5,13 @@
 //   block:  solid barrier, extends `value` tiles from (x,y) in `dir`
 //   door:   open only while bit `bit` of its register is 1
 // `locked` lists shift directions that are disabled for that level.
+// `par` is the fewest shifts needed; `node tools/solve.js` checks it.
 
 const LEVELS = [
   {
     name: 'Hello, Shift',
     hint: 'Left Shift doubles R0. Make the bridge long enough to cross.',
+    par: 2,
     regs: [0b0001],
     map: [
       '##############',
@@ -27,7 +29,8 @@ const LEVELS = [
   {
     name: 'Halve It',
     hint: 'Right Shift halves R0. Shrink the wall.',
-    regs: [0b1000],
+    par: 2,
+    regs: [0b1110],
     map: [
       '##############',
       '#............#',
@@ -44,6 +47,7 @@ const LEVELS = [
   {
     name: 'Shared Register',
     hint: 'One register drives the bridge AND the walls. Order matters.',
+    par: 3,
     regs: [0b0001],
     map: [
       '##############',
@@ -65,6 +69,7 @@ const LEVELS = [
   {
     name: 'Bit Gates',
     hint: 'Doors read a single bit. Tab switches registers.',
+    par: 5,
     regs: [0b0011, 0b0001],
     map: [
       '##############',
@@ -86,6 +91,7 @@ const LEVELS = [
   {
     name: 'Overflow',
     hint: 'Your Right Shift key is broken. Bits that fall off the end are gone.',
+    par: 4,
     regs: [0b0111],
     locked: ['right'],
     map: [
@@ -103,4 +109,130 @@ const LEVELS = [
       { type: 'block', x: 8, y: 4, dir: 'R', reg: 0 },
     ],
   },
+  {
+    name: 'Meet in the Middle',
+    hint: 'Two bridges, one register. They only need to meet.',
+    par: 2,
+    regs: [0b0011],
+    map: [
+      '##############',
+      '#..~~~~~~~...#',
+      '#..~~~~~~~...#',
+      '#..~~~~~~~...#',
+      '#P.~~~~~~~..G#',
+      '#..~~~~~~~...#',
+      '#..~~~~~~~...#',
+      '#..~~~~~~~...#',
+      '##############',
+    ],
+    objects: [
+      { type: 'bridge', x: 3, y: 4, dir: 'R', reg: 0 },
+      { type: 'bridge', x: 9, y: 4, dir: 'L', reg: 0 },
+      { type: 'block', x: 11, y: 1, dir: 'D', reg: 0 },
+      { type: 'block', x: 11, y: 7, dir: 'U', reg: 0 },
+    ],
+  },
+  {
+    name: 'Combination Lock',
+    hint: 'Neighbouring doors need their bits at the same time. Lost bits never come back.',
+    par: 3,
+    regs: [0b1100],
+    map: [
+      '##############',
+      '#....~~~~##..#',
+      '#....~~~~##..#',
+      '#....~~~~##..#',
+      '#P...~~~~...G#',
+      '#....~~~~##..#',
+      '#....~~~~##..#',
+      '#....~~~~##..#',
+      '##############',
+    ],
+    objects: [
+      { type: 'block', x: 3, y: 1, dir: 'D', reg: 0 },
+      { type: 'block', x: 3, y: 7, dir: 'U', reg: 0 },
+      { type: 'bridge', x: 5, y: 4, dir: 'R', reg: 0 },
+      { type: 'door', x: 9, y: 4, reg: 0, bit: 2 },
+      { type: 'door', x: 10, y: 4, reg: 0, bit: 1 },
+    ],
+  },
+  {
+    name: 'Pistons',
+    hint: 'A piston only reaches the corridor if its value is big enough.',
+    par: 4,
+    regs: [0b0110],
+    map: [
+      '##############',
+      '###~##########',
+      '###~##########',
+      '###~#~########',
+      '#P.~...~~...G#',
+      '########~#####',
+      '########~#####',
+      '##############',
+      '##############',
+    ],
+    objects: [
+      { type: 'bridge', x: 3, y: 1, dir: 'D', reg: 0 },
+      { type: 'block', x: 5, y: 3, dir: 'D', reg: 0 },
+      { type: 'bridge', x: 7, y: 4, dir: 'D', reg: 0 },
+      { type: 'bridge', x: 8, y: 6, dir: 'U', reg: 0 },
+      { type: 'door', x: 9, y: 4, reg: 0, bit: 2 },
+    ],
+  },
+  {
+    name: 'Crossed Wires',
+    hint: 'Shift left then right to trim the top bit.',
+    par: 5,
+    regs: [0b1011, 0b0001],
+    map: [
+      '##############',
+      '#...##########',
+      '#...##########',
+      '#...##########',
+      '#P...~~~~.~~G#',
+      '#...##########',
+      '#...##########',
+      '#...##########',
+      '##############',
+    ],
+    objects: [
+      { type: 'block', x: 3, y: 1, dir: 'D', reg: 0 },
+      { type: 'block', x: 3, y: 7, dir: 'U', reg: 0 },
+      { type: 'door', x: 4, y: 4, reg: 1, bit: 2 },
+      { type: 'bridge', x: 5, y: 4, dir: 'R', reg: 0 },
+      { type: 'door', x: 9, y: 4, reg: 0, bit: 1 },
+      { type: 'bridge', x: 10, y: 4, dir: 'R', reg: 1 },
+    ],
+  },
+  {
+    name: 'Still Broken',
+    hint: 'Right Shift is still broken. Plan every doubling.',
+    par: 6,
+    regs: [0b0011, 0b0101],
+    locked: ['right'],
+    map: [
+      '##############',
+      '###~##########',
+      '###~##########',
+      '###~##########',
+      '#P.~...~....G#',
+      '#######~######',
+      '#######~######',
+      '#######~######',
+      '##############',
+    ],
+    objects: [
+      { type: 'door', x: 2, y: 4, reg: 0, bit: 0 },
+      { type: 'bridge', x: 3, y: 1, dir: 'D', reg: 1 },
+      { type: 'door', x: 5, y: 4, reg: 1, bit: 3 },
+      { type: 'door', x: 6, y: 4, reg: 0, bit: 2 },
+      { type: 'bridge', x: 7, y: 7, dir: 'U', reg: 0 },
+      { type: 'door', x: 8, y: 4, reg: 1, bit: 2 },
+      { type: 'door', x: 9, y: 4, reg: 0, bit: 3 },
+      { type: 'block', x: 10, y: 4, dir: 'D', reg: 1 },
+    ],
+  },
 ];
+
+if (typeof module !== 'undefined') module.exports = { LEVELS };
